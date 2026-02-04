@@ -1,21 +1,24 @@
 FROM php:8.2-apache
 
-# Disable all MPMs first (THIS IS THE KEY)
-RUN a2dismod mpm_event mpm_worker || true
+# 🔥 FORCE REMOVE all MPM configs
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+    && rm -f /etc/apache2/mods-enabled/mpm_*.conf
 
-# Enable prefork MPM (required for PHP)
+# ✅ Enable ONLY prefork MPM
 RUN a2enmod mpm_prefork
 
-# Enable rewrite (optional but common)
+# Enable rewrite
 RUN a2enmod rewrite
 
-# Install PDO MySQL
+# Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Copy app files
+# Copy app
 COPY . /var/www/html/
 
-# Fix permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
+
+CMD ["apache2-foreground"]
