@@ -1,15 +1,21 @@
 <?php
-$host = getenv("MYSQLHOST");
-$db   = getenv("MYSQLDATABASE");
-$user = getenv("MYSQLUSER");
-$pass = getenv("MYSQLPASSWORD");
-$port = getenv("MYSQLPORT");
+$host = getenv('MYSQLHOST');
+$db   = getenv('MYSQLDATABASE');
+$user = getenv('MYSQLUSER');
+$pass = getenv('MYSQLPASSWORD');
+$port = getenv('MYSQLPORT');
+
+if (!$host || !$db || !$user || !$pass || !$port) {
+    die("Missing MySQL environment variables");
+}
 
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
 
 try {
-    $pdo = new PDO($dsn, $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]);
 } catch (PDOException $e) {
     die("DB Connection failed: " . $e->getMessage());
 }
