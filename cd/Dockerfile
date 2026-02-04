@@ -1,9 +1,16 @@
 FROM php:8.2-apache
 
-RUN a2enmod rewrite
+# Disable all MPMs, then enable prefork ONLY
+RUN a2dismod mpm_event mpm_worker || true \
+ && a2enmod mpm_prefork rewrite
 
-COPY . /var/www/html/
+# Set Apache document root
+WORKDIR /var/www/html
 
+# Copy app files
+COPY . .
+
+# Fix permissions
 RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
